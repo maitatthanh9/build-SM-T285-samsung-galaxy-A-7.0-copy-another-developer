@@ -21,12 +21,8 @@ jobs:
         run: |
           export ARCH=arm
           export CROSS_COMPILE=arm-linux-gnueabi-
-          
-          # Thiết lập cấu hình
           make gtexswifi-dt_defconfig
-          
-          # Build với cờ hỗ trợ cho mã nguồn cũ (tắt bớt warning)
-          make -j$(nproc) KBUILD_CFLAGS="-w"
+          make -j$(nproc) KCFLAGS="-w" DISABLE_WERROR=1
           
       - name: Save Kernel Result
         uses: actions/upload-artifact@v4
