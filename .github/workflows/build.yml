@@ -1,0 +1,35 @@
+name: Build Kernel SM-T285
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          ref: 'cm-14.1'
+
+      - name: Install Compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-linux-gnueabi
+
+      - name: Build Kernel
+        run: |
+          export ARCH=arm
+          export CROSS_COMPILE=arm-linux-gnueabi-
+          
+          # Biên dịch cấu hình từ file bạn đã xác định
+          make gtexswifi-dt_defconfig
+          
+          # Bắt đầu biên dịch kernel với tất cả nhân CPU ảo để tăng tốc
+          make -j$(nproc)
+          
+      - name: Save Kernel Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-output
+          path: arch/arm/boot/zImage*
