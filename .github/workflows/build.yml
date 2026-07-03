@@ -22,11 +22,11 @@ jobs:
           export ARCH=arm
           export CROSS_COMPILE=arm-linux-gnueabi-
           
-          # Biên dịch cấu hình từ file bạn đã xác định
+          # Thiết lập cấu hình
           make gtexswifi-dt_defconfig
           
-          # Bắt đầu biên dịch kernel với tất cả nhân CPU ảo để tăng tốc
-          make -j$(nproc)
+          # Build với cờ hỗ trợ cho mã nguồn cũ (tắt bớt warning)
+          make -j$(nproc) KBUILD_CFLAGS="-w"
           
       - name: Save Kernel Result
         uses: actions/upload-artifact@v4
