@@ -17,17 +17,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-arm-linux-gnueabi
 
+      - name: Fix Kernel Source
+        run: |
+          find . -type f \( -name "*.h" -o -name "*.c" \) -exec sed -i '/error "Unknown architecture specification"/d' {} +
+          find . -name "Makefile" -exec sed -i 's/-Werror//g' {} +
+          find . -name "*.mk" -exec sed -i 's/-Werror//g' {} +
+
       - name: Build Kernel
         run: |
           export ARCH=arm
           export CROSS_COMPILE=arm-linux-gnueabi-
-          
-          # Fix "Unknown architecture specification"
-          sed -i 's/#error "Unknown architecture specification"//g' include/soc/sprd/hardware.h
+          export KBUILD_BUILD_USER=builder
+          export KBUILD_BUILD_HOST=github
           
           make gtexswifi-dt_defconfig
-          make -j$(nproc) KCFLAGS="-w" HOSTCFLAGS="-w" DISABLE_WERROR=1
-          
+          make -j$(nproc) KCFLAGS="-w" HOSTCFLAGS="-w"
+
       - name: Save Kernel Result
         uses: actions/upload-artifact@v4
         with:
