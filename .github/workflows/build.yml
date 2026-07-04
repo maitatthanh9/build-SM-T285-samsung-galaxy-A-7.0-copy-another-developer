@@ -21,19 +21,21 @@ jobs:
         run: |
           export ARCH=arm
           export CROSS_COMPILE=arm-linux-gnueabi-
-          export KCFLAGS="-w -DCONFIG_ARCH_SPR -DCONFIG_ARCH_GTEXSWIFI"
-          export HOSTCFLAGS="-w -DCONFIG_ARCH_SPR"
-          sed -i '/error "Unknown architecture specification"/d' include/soc/sprd/hardware.h
-          make gtexswifi-dt_defconfig
-          make -j$(nproc) zImage
-          make -j$(nproc) dtbs
+          export KCFLAGS="-w -DCONFIG_ARCH_SPR -DCONFIG_ARCH_GTEXSWIFI -fno-pie -fgnu89-inline"
+          export HOSTCFLAGS="-w -DCONFIG_ARCH_SPR -fno-pie -fgnu89-inline"
           
+          sed -i '/error "Unknown architecture specification"/d' include/soc/sprd/hardware.h
+          find . -name "Makefile" -exec sed -i 's/-Werror//g' {} +
+          
+          make gtexswifi-dt_defconfig
+          make -j$(nproc) zImage dtbs
+
       - name: Prepare Output
         run: |
           mkdir -p output
           cp arch/arm/boot/zImage output/
-          find arch/arm/boot/ -name "*.dtb" -exec cp {} output/ \;
-          
+          find arch/arm/boot/dts/ -name "*.dtb" -exec cp {} output/ \;
+
       - name: Save Kernel Result
         uses: actions/upload-artifact@v4
         with:
