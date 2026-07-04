@@ -15,24 +15,20 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-linux-gnueabi
-
-      - name: Fix Kernel Source
-        run: |
-          find . -type f \( -name "*.h" -o -name "*.c" \) -exec sed -i '/error "Unknown architecture specification"/d' {} +
-          find . -name "Makefile" -exec sed -i 's/-Werror//g' {} +
-          find . -name "*.mk" -exec sed -i 's/-Werror//g' {} +
+          sudo apt-get install -y gcc-arm-linux-gnueabi bison flex libssl-dev
 
       - name: Build Kernel
         run: |
           export ARCH=arm
           export CROSS_COMPILE=arm-linux-gnueabi-
-          export KBUILD_BUILD_USER=builder
-          export KBUILD_BUILD_HOST=github
+          
+          export KCFLAGS="-w"
+          export HOSTCFLAGS="-w -fgnu89-inline"
           
           make gtexswifi-dt_defconfig
-          make -j$(nproc) KCFLAGS="-w" HOSTCFLAGS="-w"
-
+          make -j$(nproc) scripts
+          make -j$(nproc)
+          
       - name: Save Kernel Result
         uses: actions/upload-artifact@v4
         with:
