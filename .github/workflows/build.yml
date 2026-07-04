@@ -15,13 +15,11 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          # Cài đặt GCC phiên bản cũ hơn để tương thích với Kernel 3.10
           sudo apt-get install -y gcc-arm-linux-gnueabi gcc-6-arm-linux-gnueabi
 
       - name: Build Kernel
         run: |
           export ARCH=arm
-          # Sử dụng gcc-6 thay vì phiên bản mặc định
           export CROSS_COMPILE=arm-linux-gnueabi-
           export CC=arm-linux-gnueabi-gcc-6
           
